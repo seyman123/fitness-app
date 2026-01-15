@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../../assets/images/report/veritabani_erd.svg"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile              UserProfile?
+  waterTrackings       WaterTracking[]
+  nutritionLogs        NutritionLog[]
+  workouts             Workout[]
+  workoutLogs          WorkoutLog[]
+  stepTrackings        StepTracking[]
+  weightHistory        WeightHistory[]
+  sleepLogs            SleepLog[]
+  notificationSettings NotificationSettings?
+}
+
+model UserProfile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  age       Int
+  gender    String   // 'male' or 'female'
+  height    Float    // cm
+  weight    Float    // kg
+  goalWeight Float?   // kg (optional hedef kilo)
+  goalType  String   @default("MAINTAIN") // 'LOSE_WEIGHT', 'GAIN_WEIGHT', 'BUILD_MUSCLE', 'MAINTAIN', 'GET_FIT'
+  activityLevel Float @default(1.2) // aktivite seviyesi
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WaterTracking {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount    Int      // ml cinsinden
+  date      DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model NutritionLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  mealType  String   // 'breakfast', 'lunch', 'dinner', 'snack'
+  foodName  String
+  calories  Float
+  protein   Float?   // gram
+  carbs     Float?   // gram
+  fat       Float?   // gram
+  date      DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model Workout {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  isTemplate  Boolean  @default(false) // Hazır program mı yoksa kullanıcı özel mi
+  exercises   WorkoutExercise[]
+  logs        WorkoutLog[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model WorkoutExercise {
+  id          String   @id @default(uuid())
+  workoutId   String
+  workout     Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+
+  name        String
+  sets        Int
+  reps        Int
+  restSeconds Int?
+  notes       String?
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+}
+
+model WorkoutLog {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workoutId   String
+  workout     Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+
+  date        DateTime @default(now())
+  duration    Int?     // dakika cinsinden
+  notes       String?
+  completed   Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model StepTracking {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  steps     Int      // günlük adım sayısı
+  date      DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model WeightHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  weight    Float    // kg
+  bmi       Float?   // Body Mass Index
+  notes     String?  // Kullanıcı notları
+  date      DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model SleepLog {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sleepStart   DateTime // Uyku başlangıç zamanı
+  sleepEnd     DateTime // Uyku bitiş zamanı
+  duration     Int      // Toplam uyku süresi (dakika)
+  quality      String?  // 'POOR', 'FAIR', 'GOOD', 'EXCELLENT'
+  notes        String?  // Kullanıcı notları
+  date         DateTime @default(now()) // Uykunun başladığı gün
+
+  createdAt    DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model NotificationSettings {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Antrenman hatırlatıcıları
+  workoutReminders Boolean @default(true)
+  workoutTime      String  @default("09:00") // HH:mm formatında
+
+  // Su hatırlatıcıları
+  waterReminders Boolean @default(true)
+  waterInterval  Int     @default(120) // dakika cinsinden (varsayılan 2 saat)
+
+  // Günlük özet bildirimi
+  dailySummary     Boolean @default(true)
+  dailySummaryTime String  @default("20:00") // HH:mm formatında
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

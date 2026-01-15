@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="950" viewBox="0 0 1600 950">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #0b1220; }
+      .subtitle { font: 500 18px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0b1220; }
+      .t { font: 500 16px 'Segoe UI', Arial, sans-serif; fill: #0b1220; }
+      .note { font: 500 15px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .mono { font: 600 14px 'Consolas', 'Courier New', monospace; fill: #0b1220; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="950" fill="#ffffff"/>
+
+  <text x="70" y="85" class="title">Görsel 4 — BLoC Pattern Akış Diyagramı</text>
+  <text x="70" y="120" class="subtitle">Event → BLoC → State akışı (örnek: Water modülü)</text>
+
+  <!-- Swimlanes container -->
+  <rect x="60" y="160" width="1480" height="740" rx="18" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2" filter="url(#shadow)"/>
+
+  <!-- Lanes -->
+  <rect x="90" y="210" width="360" height="650" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2"/>
+  <rect x="470" y="210" width="520" height="650" rx="16" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <rect x="1010" y="210" width="500" height="650" rx="16" fill="#ffedd5" stroke="#fb923c" stroke-width="2"/>
+
+  <text x="120" y="245" class="h">UI (Widget)</text>
+  <text x="500" y="245" class="h">BLoC (Presentation)</text>
+  <text x="1040" y="245" class="h">Domain + Data</text>
+
+  <!-- UI block -->
+  <rect x="120" y="290" width="300" height="120" rx="14" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+  <text x="145" y="330" class="h">WaterTrackingPage</text>
+  <text x="145" y="360" class="t">BlocConsumer &amp; UI Rebuild</text>
+  <text x="145" y="390" class="note">Loading / Error / Loaded</text>
+
+  <!-- Events box -->
+  <rect x="500" y="290" width="460" height="140" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+  <text x="525" y="330" class="h">Event</text>
+  <text x="525" y="360" class="mono">LoadTodayWater, AddWaterEntry(amount)</text>
+  <text x="525" y="388" class="mono">DeleteWaterEntry(id), RefreshWater</text>
+
+  <!-- Bloc processing -->
+  <rect x="500" y="460" width="460" height="170" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+  <text x="525" y="500" class="h">WaterBloc</text>
+  <text x="525" y="530" class="t">on&lt;Event&gt;(...) handler çalışır</text>
+  <text x="525" y="560" class="t">emit(WaterLoading)</text>
+  <text x="525" y="590" class="t">repository çağrısı + sonucu fold</text>
+
+  <!-- States box -->
+  <rect x="500" y="660" width="460" height="190" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+  <text x="525" y="700" class="h">State</text>
+  <text x="525" y="730" class="mono">WaterInitial, WaterLoading</text>
+  <text x="525" y="758" class="mono">WaterLoaded(entries, totalAmount)</text>
+  <text x="525" y="786" class="mono">WaterOperationSuccess(message)</text>
+  <text x="525" y="814" class="mono">WaterError(message)</text>
+
+  <!-- Repository / Use case side -->
+  <rect x="1040" y="290" width="440" height="130" rx="14" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+  <text x="1065" y="330" class="h">Repository</text>
+  <text x="1065" y="360" class="mono">WaterRepository</text>
+  <text x="1065" y="388" class="note">getTodayWater(), addWaterEntry(), ...</text>
+
+  <rect x="1040" y="450" width="440" height="140" rx="14" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+  <text x="1065" y="490" class="h">Data Source</text>
+  <text x="1065" y="520" class="mono">HTTP / Local</text>
+  <text x="1065" y="548" class="note">API Client, Hive/SQLite vb.</text>
+
+  <rect x="1040" y="630" width="440" height="120" rx="14" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+  <text x="1065" y="670" class="h">Sonuç</text>
+  <text x="1065" y="700" class="t">Either&lt;Failure, Data&gt;</text>
+  <text x="1065" y="728" class="note">Success → Loaded / Failure → Error</text>
+
+  <!-- Arrows: UI -> Event -> Bloc -> Repository -> DataSource -->
+  <path d="M 420 350 C 460 350, 480 340, 500 340" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="430" y="328" class="note">1) kullanıcı etkileşimi</text>
+
+  <path d="M 730 430 C 730 445, 730 452, 730 460" fill="none" stroke="#16a34a" stroke-width="3" marker-end="url(#arrowGreen)"/>
+  <text x="750" y="452" class="note">2) event işlensin</text>
+
+  <path d="M 960 545 C 990 545, 1010 360, 1040 360" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="905" y="515" class="note">3) repository çağrısı</text>
+
+  <path d="M 1260 420 C 1260 430, 1260 440, 1260 450" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="1280" y="438" class="note">4) veri kaynağı</text>
+
+  <!-- Return arrows: success/failure -> states -> UI -->
+  <path d="M 1040 690 C 1010 690, 990 760, 960 760" fill="none" stroke="#16a34a" stroke-width="3" marker-end="url(#arrowGreen)"/>
+  <text x="980" y="735" class="note">5) success</text>
+
+  <path d="M 1040 730 C 1010 730, 990 815, 960 815" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrowRed)"/>
+  <text x="980" y="805" class="note">5) failure</text>
+
+  <path d="M 500 780 C 460 780, 440 430, 420 410" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="130" y="440" class="note">6) UI state'e göre güncellenir</text>
+
+  <!-- Legend -->
+  <rect x="90" y="175" width="620" height="26" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="110" y="194" class="note">Yeşil ok: başarılı akış • Kırmızı ok: hata akışı • Gri ok: genel veri akışı</text>
+</svg>
